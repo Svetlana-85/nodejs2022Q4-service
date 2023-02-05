@@ -36,7 +36,7 @@ export class AlbumsController {
     }
     const album = this.albumsService.findOne(id);
     if (album) return album;
-    throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
   }
 
   @Put(':id')
@@ -52,7 +52,7 @@ export class AlbumsController {
     }
     const album = this.albumsService.findOne(id);
     if (album) return this.albumsService.update(id, updateAlbumDto);
-    throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
   }
 
   @Delete(':id')
@@ -66,6 +66,6 @@ export class AlbumsController {
       response.status(204).send();
       return;
     }
-    throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
   }
 }
