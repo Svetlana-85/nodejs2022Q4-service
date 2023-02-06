@@ -9,11 +9,11 @@ import {
   HttpStatus,
   HttpException,
   HttpCode,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { validate as uuidValidate } from 'uuid';
 
 @Controller('artist')
 export class ArtistsController {
@@ -30,26 +30,17 @@ export class ArtistsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    if (!uuidValidate(id)) {
-      throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
-    }
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     const artist = this.artistsService.findOne(id);
     if (artist) return artist;
     throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
-    if (!uuidValidate(id)) {
-      throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
-    }
-    if (
-      typeof updateArtistDto.name !== 'string' ||
-      typeof updateArtistDto.grammy !== 'boolean'
-    ) {
-      throw new HttpException('Invalid body', HttpStatus.BAD_REQUEST);
-    }
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateArtistDto: UpdateArtistDto,
+  ) {
     const artist = this.artistsService.findOne(id);
     if (artist) return this.artistsService.update(id, updateArtistDto);
     throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
@@ -57,10 +48,7 @@ export class ArtistsController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
-    if (!uuidValidate(id)) {
-      throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
-    }
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     if (!this.artistsService.findOne(id)) {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }

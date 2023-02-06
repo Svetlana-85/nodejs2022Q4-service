@@ -11,11 +11,11 @@ import {
   HttpStatus,
   Put,
   HttpCode,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
-import { validate as uuidValidate } from 'uuid';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('user')
@@ -36,10 +36,7 @@ export class UsersController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  findOne(@Param('id') id: string): UserEntity {
-    if (!uuidValidate(id)) {
-      throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
-    }
+  findOne(@Param('id', ParseUUIDPipe) id: string): UserEntity {
     const user = this.usersService.findOne(id);
     if (user) {
       return new UserEntity({
@@ -52,18 +49,9 @@ export class UsersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ): UserEntity {
-    if (!uuidValidate(id)) {
-      throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
-    }
-    if (
-      !updatePasswordDto ||
-      !updatePasswordDto.newPassword ||
-      !updatePasswordDto.oldPassword
-    )
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     const user = this.usersService.findOne(id);
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     if (user.password !== updatePasswordDto.oldPassword) {
@@ -76,10 +64,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string): void {
-    if (!uuidValidate(id)) {
-      throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
-    }
+  remove(@Param('id', ParseUUIDPipe) id: string): void {
     const user = this.usersService.findOne(id);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);

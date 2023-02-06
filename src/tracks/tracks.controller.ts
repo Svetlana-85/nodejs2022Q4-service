@@ -9,11 +9,11 @@ import {
   HttpException,
   HttpStatus,
   HttpCode,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { validate as uuidValidate } from 'uuid';
 
 @Controller('track')
 export class TracksController {
@@ -30,26 +30,17 @@ export class TracksController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    if (!uuidValidate(id)) {
-      throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
-    }
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     const track = this.tracksService.findOne(id);
     if (track) return track;
     throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
-    if (!uuidValidate(id)) {
-      throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
-    }
-    if (
-      typeof updateTrackDto.name !== 'string' ||
-      typeof updateTrackDto.duration !== 'number'
-    ) {
-      throw new HttpException('Invalid body', HttpStatus.BAD_REQUEST);
-    }
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
     const track = this.tracksService.findOne(id);
     if (track) return this.tracksService.update(id, updateTrackDto);
     throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
@@ -57,10 +48,7 @@ export class TracksController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
-    if (!uuidValidate(id)) {
-      throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
-    }
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     if (!this.tracksService.findOne(id)) {
       throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }
