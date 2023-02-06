@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { FavoritesService } from 'src/favorites/favorites.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { TrackStorage } from './store/album.storage';
+import { TrackStorage } from './store/track.storage';
 
 @Injectable()
 export class TracksService {
-  constructor(private storage: TrackStorage) {}
+  constructor(
+    private storage: TrackStorage,
+    @Inject(forwardRef(() => FavoritesService))
+    private readonly favoriteService: FavoritesService,
+  ) {}
 
   create(createTrackDto: CreateTrackDto) {
     return this.storage.create(createTrackDto);
@@ -24,6 +29,9 @@ export class TracksService {
   }
 
   remove(id: string) {
-    return this.storage.delete(id);
+    if (this.favoriteService.findTrack(id)) {
+      this.favoriteService.removeTrack(id);
+    }
+    this.storage.delete(id);
   }
 }

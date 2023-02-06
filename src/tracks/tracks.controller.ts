@@ -8,7 +8,7 @@ import {
   Delete,
   HttpException,
   HttpStatus,
-  Res,
+  HttpCode,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -56,16 +56,14 @@ export class TracksController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Res() response) {
+  @HttpCode(204)
+  remove(@Param('id') id: string) {
     if (!uuidValidate(id)) {
       throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
     }
-    const track = this.tracksService.findOne(id);
-    if (track) {
-      this.tracksService.remove(id);
-      response.status(204).send();
-      return;
+    if (!this.tracksService.findOne(id)) {
+      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+    this.tracksService.remove(id);
   }
 }

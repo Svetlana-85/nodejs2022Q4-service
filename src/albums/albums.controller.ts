@@ -8,7 +8,7 @@ import {
   Delete,
   HttpException,
   HttpStatus,
-  Res,
+  HttpCode,
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -56,16 +56,14 @@ export class AlbumsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Res() response) {
+  @HttpCode(204)
+  remove(@Param('id') id: string) {
     if (!uuidValidate(id)) {
       throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
     }
-    const album = this.albumsService.findOne(id);
-    if (album) {
-      this.albumsService.remove(id);
-      response.status(204).send();
-      return;
+    if (!this.albumsService.findOne(id)) {
+      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+    this.albumsService.remove(id);
   }
 }

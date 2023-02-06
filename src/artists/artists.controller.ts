@@ -8,7 +8,7 @@ import {
   Delete,
   HttpStatus,
   HttpException,
-  Res,
+  HttpCode,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -56,16 +56,14 @@ export class ArtistsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Res() response) {
+  @HttpCode(204)
+  remove(@Param('id') id: string) {
     if (!uuidValidate(id)) {
       throw new HttpException('ID is invalid', HttpStatus.BAD_REQUEST);
     }
-    const artist = this.artistsService.findOne(id);
-    if (artist) {
-      this.artistsService.remove(id);
-      response.status(204).send();
-      return;
+    if (!this.artistsService.findOne(id)) {
+      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    this.artistsService.remove(id);
   }
 }
