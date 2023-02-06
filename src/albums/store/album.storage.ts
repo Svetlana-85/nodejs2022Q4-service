@@ -42,4 +42,8 @@ export class AlbumStorage implements AlbumStore {
   delete(id: string): void {
     this.albums = this.albums.filter((item) => item.id !== id);
   }
+
+  findAllArtistsAlbum(id: string): AlbumEntity[] {
+    return this.albums.filter((item) => item.artistId === id);
+  }
 }

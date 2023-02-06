@@ -34,4 +34,22 @@ export class TracksService {
     }
     this.storage.delete(id);
   }
+
+  changeArtistId(id: string) {
+    const tracks = this.storage.findAllArtistsTrack(id);
+    tracks.forEach((item) => {
+      const track = this.findOne(item.id);
+      track.artistId = null;
+      this.update(item.id, track);
+    });
+  }
+
+  changeAlbumId(id: string) {
+    const tracks = this.storage.findAllAlbumTrack(id);
+    tracks.forEach((item) => {
+      const track = this.findOne(item.id);
+      track.albumId = null;
+      this.update(item.id, track);
+    });
+  }
 }

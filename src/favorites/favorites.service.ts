@@ -12,9 +12,11 @@ import { FavoriteStorage } from './store/favorite.storage';
 export class FavoritesService {
   constructor(
     private storage: FavoriteStorage,
+    @Inject(forwardRef(() => TracksService))
     private readonly trackService: TracksService,
     @Inject(forwardRef(() => ArtistsService))
     private readonly artistService: ArtistsService,
+    @Inject(forwardRef(() => AlbumsService))
     private readonly albumService: AlbumsService,
   ) {}
 

@@ -42,4 +42,12 @@ export class TrackStorage implements TrackStore {
   delete(id: string): void {
     this.tracks = this.tracks.filter((item) => item.id !== id);
   }
+
+  findAllArtistsTrack(id: string): TrackEntity[] {
+    return this.tracks.filter((item) => item.artistId === id);
+  }
+
+  findAllAlbumTrack(id: string): TrackEntity[] {
+    return this.tracks.filter((item) => item.albumId === id);
+  }
 }
